@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.label.dao.ILabelDao"> 
+	<!-- 自定义结果集 --> 
+	<resultMap id="BaseResultMap" type="com.qhit.label.pojo.Label"> 
+		<id property="labelId" column="label_id" javaType="java.lang.Integer"></id> 
+		<result property="labelName" column="label_name" javaType="java.lang.String"></result> 
+	</resultMap> 
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    --> 
+ 
+	<sql id="Base_Column_List" > 
+		label_id,label_name 
+	</sql> 
+	<select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from label 
+		where label_id = #{labelId} 
+	</select> 
+	<delete id="delete" parameterType="java.lang.Integer" > 
+		delete from label 
+		where label_id = #{labelId} 
+	</delete> 
+	<insert id="insert" parameterType="com.qhit.label.pojo.Label" > 
+		insert into label(label_name) 
+		values (#{labelName}) 
+	</insert> 
+	<update id="updateSelective" parameterType="com.qhit.label.pojo.Label" > 
+		update label 
+		<set > 
+			<if test="labelName != null and labelName!='' " > 
+				label_name = #{labelName}, 
+			</if> 
+		</set> 
+		where label_id = #{labelId} 
+	</update> 
+	<update id="update" parameterType="com.qhit.label.pojo.Label" > 
+		update label 
+		set  label_name = #{labelName} 
+		where label_id = #{labelId} 
+	</update> 
+	<select id="findAll" resultMap="BaseResultMap" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from label 
+	</select> 
+	<select id="findByLabelName" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from label 
+		where label_name = #{labelName} 
+	</select>
+	<select id="findByAsId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+		SELECT * FROM label la
+		JOIN association_label al ON la.label_id=al.label_id
+		WHERE al.as_label = #{asId}
+	</select>
+	<delete id="deleteBatch" parameterType="java.util.Arrays"> 
+		delete from label where label_id in 
+		<foreach collection="array" item="id" open="(" close=")" separator=","> 
+			#{id} 
+		</foreach> 
+	</delete> 
+	<select id="search" parameterType="com.qhit.label.pojo.Label" resultMap="BaseResultMap"> 
+		select * from  label 
+		<where > 
+			<if test="labelName != null and labelName!='' " > 
+				 and label_name = #{labelName} 
+			</if> 
+		</where> 
+	</select> 
+</mapper> 
